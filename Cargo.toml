@@ -1,0 +1,13 @@
+[package]
+name = "mandelbrot"
+version = "0.1.0"
+edition = "2021"
+
+[profile.dev]
+incremental = true
+
+[dependencies]
+chrono = "0.4.38"
+image = "0.25.1"
+num = "0.4.3"
+
