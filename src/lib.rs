@@ -1,8 +1,8 @@
-use::num::complex::Complex;
-use::std::path::{ PathBuf, Path };
-use::chrono::Local;
-use::image::{Rgb, RgbImage};
-use::std::fs;
+use ::chrono::Local;
+use ::image::{Rgb, RgbImage};
+use ::num::complex::Complex;
+use ::std::fs;
+use ::std::path::{Path, PathBuf};
 
 pub fn run() {
     //figure out parameters
@@ -19,12 +19,34 @@ pub fn iterations(iterations: u32, point: Complex<f64>) -> Option<u32> {
     let mut z1 = Complex::new(0.0, 0.0);
     while i <= iterations {
         if z1.norm_sqr() > 4.0 {
-            return Some(i)
-        }    
+            return Some(i);
+        }
         z1 = z1.powi(2) + point;
         i += 1;
     }
     None
+}
+
+pub fn mandelbrot(center: Complex<f64>, zoom: f64, mut img: RgbImage, colors: ColorMap) -> RgbImage {
+    let zoom = 2.0 * (1.0 / zoom);
+    let (width, height) = img.dimensions();
+
+    for (x, y, pixel) in img.enumerate_pixels_mut() {
+        //this code needs to be refactored elsewhere
+        //get width and hight
+        //convert width to real component
+        //convert hight to imaginary component
+        //build complex representation
+        let re = (x as f64 / width as f64 - 0.5) * zoom + center.re;
+        let im = (y as f64 / height as f64 - 0.5) * zoom + center.im;
+        let point = Complex::new(re, im);
+
+        match iterations(1023, point) {
+            Some(val) => *pixel = colors.assign(val),
+            None => *pixel = Rgb([0, 0, 0]),
+        }
+    }
+    img
 }
 
 //to make a color map we need to take in a file that describes it
@@ -58,22 +80,25 @@ pub fn build_colormap<P: AsRef<Path>>(path: P) -> Result<ColorMap, String> {
     for line in contents.lines() {
         data.push(parse_line(line).unwrap());
     }
-    Ok(ColorMap::new(data, contents.lines().count().try_into().unwrap()))
+    Ok(ColorMap::new(
+        data,
+        contents.lines().count().try_into().unwrap(),
+    ))
 }
 
 fn parse_line(line: &str) -> Result<Rgb<u8>, String> {
-    let c: Vec<u8> = line.split(' ').map(|val| val.parse::<u8>().unwrap()).collect();
+    let c: Vec<u8> = line
+        .split(' ')
+        .map(|val| val.parse::<u8>().unwrap())
+        .collect();
     Ok(Rgb([c[0], c[1], c[2]]))
 }
 
-pub fn transform() {
-
-}
+pub fn transform() {}
 
 //creates a timestamped path using an output folder and a prefix
 pub fn build_path(folder: &str, prefix: &str) -> PathBuf {
-    let time = Local::now()
-        .format("%F-%T");
+    let time = Local::now().format("%F-%T");
 
     let file = format!("{folder}/{prefix}-{time}.png");
     let path = PathBuf::from(&file);
