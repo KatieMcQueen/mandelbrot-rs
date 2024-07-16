@@ -4,6 +4,7 @@ use ::num::complex::Complex;
 use ::std::fs;
 use ::std::path::{Path, PathBuf};
 
+
 pub fn run() {
     //figure out parameters
     //set up ouput and state
@@ -32,11 +33,6 @@ pub fn mandelbrot(center: Complex<f64>, zoom: f64, mut img: RgbImage, colors: Co
     let (width, height) = img.dimensions();
 
     for (x, y, pixel) in img.enumerate_pixels_mut() {
-        //this code needs to be refactored elsewhere
-        //get width and hight
-        //convert width to real component
-        //convert hight to imaginary component
-        //build complex representation
         let re = (x as f64 / width as f64 - 0.5) * zoom + center.re;
         let im = (y as f64 / height as f64 - 0.5) * zoom + center.im;
         let point = Complex::new(re, im);
@@ -49,10 +45,12 @@ pub fn mandelbrot(center: Complex<f64>, zoom: f64, mut img: RgbImage, colors: Co
     img
 }
 
-//to make a color map we need to take in a file that describes it
-//then we need to parse the values and save them into an array
-//because colormaps may have variable lengths,
-//we should encode both the length and the values into a struct
+pub struct Cli {
+    pub center: Complex<f64>,
+    pub zoom: f64,
+    pub dimensions: (u32, u32),
+    pub colors: ColorMap,
+}
 
 pub struct ColorMap {
     //with the data members private we need to provide access through getter functions

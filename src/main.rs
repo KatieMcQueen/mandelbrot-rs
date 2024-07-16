@@ -1,9 +1,44 @@
-use ::image::{Rgb, RgbImage};
+use ::image::{RgbImage};
 use ::mandelbrot::*;
 use ::num::complex::Complex;
 
+use clap::Parser;
+
+#[derive(Parser, Debug)]
+#[command(version, about, long_about = None)]
+struct Cli {
+    real: f64,
+    imaginary: f64,
+    zoom: f64,
+
+    #[arg(long)]
+    width: Option<u32>,
+    #[arg(long)]
+    height: Option<u32>,
+
+    ///provide a path to a colormap file
+    #[arg(short, long)]
+    colors: Option<std::path::PathBuf>,
+
+    #[arg(short, long)]
+    name: Option<String>,
+}
+
 fn main() {
-    let mut img = RgbImage::new(1000, 1000);
+    let cli = Cli::parse();
+
+    let mut dimensions = (2160, 1440);
+
+    match(cli.height, cli.width) {
+        (Some(y), Some(x)) => { dimensions = (x, y) },
+        (Some(y), None) => { dimensions.1 = y },
+        (None, Some(x)) => { dimensions.0 = x },
+        (None, None) => {},
+    }
+
+    let img = RgbImage::new(dimensions.0, dimensions.1);
+
+    
 
     println!("Building colormap!");
     let colors = build_colormap("data/color/romaO/romaO.lut").unwrap();
