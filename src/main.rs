@@ -44,8 +44,8 @@ fn main() {
     let colors = build_colormap("data/color/romaO/romaO.lut").unwrap();
     println!("Built!");
 
-    let zoom: f64 = 15625.0;
-    let center: Complex<f64> = Complex::new(-0.761574, -0.0847596);
+    let zoom: f64 = cli.zoom;
+    let center: Complex<f64> = Complex::new(cli.real, cli.imaginary);
 
     let img = mandelbrot(center, zoom, img, colors);
     
