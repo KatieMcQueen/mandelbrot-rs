@@ -7,7 +7,9 @@ use clap::Parser;
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
 struct Cli {
+    #[arg(allow_negative_numbers(true))]
     real: f64,
+    #[arg(allow_negative_numbers(true))]
     imaginary: f64,
     zoom: f64,
 

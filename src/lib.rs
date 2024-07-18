@@ -29,12 +29,38 @@ pub fn iterations(iterations: u32, point: Complex<f64>) -> Option<u32> {
 }
 
 pub fn mandelbrot(center: Complex<f64>, zoom: f64, mut img: RgbImage, colors: ColorMap) -> RgbImage {
-    let zoom = 2.0 * (1.0 / zoom);
+    //set up values for the transform
+    let zoom = 1.0 / zoom;
     let (width, height) = img.dimensions();
 
+    let width_complex = (2.0 * width as f64) / height as f64;
+
+    let mut top_left = Complex::new(-width_complex, 2.0);
+    let mut bottom_right = Complex::new(width_complex, -2.0);
+
+    //apply the zoom to both corners, then add the center to both
+    //the length of the subsection of the complex plane can be derived 
+    //by finding the delta of the top and bottom corners
+    //calculate an increment for both image dimensions 
+    //by dividing the length in that axis by the number of pixels
+    //then to obtain the complex coordinate at that image coordinate multiply each axis by the
+    //calculated increment value
+    
+    top_left = top_left.scale(zoom);
+    bottom_right = bottom_right.scale(zoom);
+
+    top_left += center;
+    bottom_right += center;
+
+    let size = top_left - bottom_right;
+    let size = Complex::new(size.re.abs(), size.im.abs());
+
+    let x_inc = size.re / width as f64;
+    let y_inc = size.im / height as f64;
+
     for (x, y, pixel) in img.enumerate_pixels_mut() {
-        let re = (x as f64 / width as f64 - 0.5) * zoom + center.re;
-        let im = ((y as f64 / height as f64 - 0.5)) * zoom - center.im;
+        let re = top_left.re + (x as f64 * x_inc);
+        let im = top_left.im - (y as f64 * y_inc);
         let point = Complex::new(re, im);
 
         match iterations(1023, point) {
