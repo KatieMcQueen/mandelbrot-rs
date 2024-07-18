@@ -34,7 +34,7 @@ pub fn mandelbrot(center: Complex<f64>, zoom: f64, mut img: RgbImage, colors: Co
 
     for (x, y, pixel) in img.enumerate_pixels_mut() {
         let re = (x as f64 / width as f64 - 0.5) * zoom + center.re;
-        let im = ((y as f64 / height as f64 - 0.5) * -1.0) * zoom + center.im;
+        let im = ((y as f64 / height as f64 - 0.5)) * zoom - center.im;
         let point = Complex::new(re, im);
 
         match iterations(1023, point) {
